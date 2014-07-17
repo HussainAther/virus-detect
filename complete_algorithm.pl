@@ -9,10 +9,10 @@ use Bio::SeqIO;
 use lib "$FindBin::RealBin/bin/PerlLib";
 use Util;
 use IO::File;
-use align qw( removeRedundancy bwa_remove );
+use align qw( removeRedundancy bwa_remove Velvet_Optimiser_combined );
 
 my $usage = <<_EOUSAGE_;
-# 12345
+
 ########################################################################
 # virus_detect.pl --file_type [String] --reference [FILE] [option] input
 #  
@@ -67,6 +67,7 @@ my $WORKING_DIR   = cwd();				# set current folder as working folder
 my $DATABASE_DIR  = $WORKING_DIR."/databases";	# set database folder
 my $BIN_DIR	  = ${FindBin::RealBin}."/bin";		# set script folder 
 my $TEMP_DIR	  = $WORKING_DIR."/temp";		# set temp folder
+my $velvet_dir = ${FindBin::RealBin}; #Velvet Optimiser directory
 my $tf = $TEMP_DIR;
 
 # basic options
@@ -96,7 +97,7 @@ my $cpu_num = 8;
 # paras for blast && identification 
 my $word_size = 11;
 my $exp_value = 1e-5;				#
-my $percent_identity = 25;			# tblastx â€œâ€˜Âµâˆžâˆžâ—ŠÃ·Â â€“ÃšÂ¡â€“Â¿Â¥Â±Â»âˆ‚â€˜Â Â±hspÂµÆ’â—ŠÃ“â€“Â°Ã•Â¨â€œÂªâ€“â€˜
+my $percent_identity = 25;			# tblastx ÒÔµ°°×ÖÊÐòÁÐÀ´±È¶ÔÊ±hspµÄ×îÐ¡Í¬Ò»ÐÔ
 my $mis_penalty_b = -1;				# megablast mismatch penlty, minus integer
 my $gap_cost_b = 2;				# megablast gap open cost, plus integer
 my $gap_extension_b = 1;			# megablast gap extension cost, plus integer
@@ -111,8 +112,8 @@ my $depth_cutoff = 5;				# depth cutoff for final result
 
 # disabled parameters or used as fixed value
 my $input_suffix='clean'; 			# input_suffix, disabled
-my $coverage=0.3;  				# âˆšÃ¸ÃƒÄ±â‰¤Å’Ã¸Âºâ€“ÃšÂ¡â€“Â»ÃÏ€ËšÂ±Âªreadsâˆâ‰¤âˆÂ«ÂµÆ’â‰¤Ã¸âˆ‘Ã·â€™ÂºÂ»Â´â‰¥Â§Â±Â»Â¿ËÂµÆ’â€žâ€“Ã·Âµ
-my $objective_type='maxLen';			# objective type for Velvet assembler: n50Â°Â¢maxLen, avgLen
+my $coverage=0.3;  				# Ã¿Ìõ²Î¿¼ÐòÁÐÈç¹û±»reads¸²¸ÇµÄ²¿·ÖÕ¼È«³¤±ÈÀýµÄãÐÖµ
+my $objective_type='maxLen';			# objective type for Velvet assembler: n50¡¢maxLen, avgLen
 my $diff_ratio= 0.25;
 my $diff_contig_cover = 0.5;
 my $diff_contig_length= 100; 
@@ -142,7 +143,7 @@ GetOptions(
 	
 	'word_size=i' =>  	\$word_size,
 	'exp_value-s' =>  	\$exp_value,
-	'percent_identity=s' => 	\$percent_identity,	# tblastxâ€œâ€˜Âµâˆžâˆžâ—ŠÃ·Â â€“ÃšÂ¡â€“Â¿Â¥Â±Â»âˆ‚â€˜Â Â±hspÂµÆ’â—ŠÃ“â€“Â°Ã•Â¨â€œÂªâ€“â€˜
+	'percent_identity=s' => 	\$percent_identity,	# tblastxÒÔµ°°×ÖÊÐòÁÐÀ´±È¶ÔÊ±hspµÄ×îÐ¡Í¬Ò»ÐÔ
 	'mis_penalty_b=i' => 	\$mis_penalty_b,
 	'gap_cost_b=i' => 	\$gap_cost_b,
 	'gap_extension_b=i' => 	\$gap_extension_b,
@@ -219,7 +220,8 @@ main: {
     
     my $cmd_align = "$BIN_DIR/alignAndCorrect.pl --file_list $file_list --reference $DATABASE_DIR/$reference --coverage $coverage --output_suffix aligned";
 	#my $cmd_align = "$BIN_DIR/alignAndCorrect.pl --file_list $file_list --reference $ref_list --coverage $coverage --output_suffix aligned";
-	Util::process_cmd($cmd_align, 1);
+	Util::process_cmd($cmd_align);
+    print "YEAAAAA";
     removeRedundancy($file_list, $file_type, "aligned", "KNOWN", $parameters_remove_redundancy);
 	#my $cmd_removeRedundancy = "$BIN_DIR/removeRedundancy_batch.pl --file_list $file_list --file_type $file_type --input_suffix aligned ".
 	#			   "--contig_prefix KNOWN $parameters_remove_redundancy";
@@ -230,6 +232,7 @@ main: {
 	# 1. remove host related reads  
 	# 2. de novo assembly
 	# 3. remove redundancy contigs after assembly
+    print "UNNH!";
 	
 	if( $host_reference ){
 		Util::print_user_message("Align reads to host reference sequences");
@@ -239,12 +242,14 @@ main: {
 		# the input suffix of unmapped reads is 'unmapped'
 		# the seq from sam file is fastq format, no matter the format of input file
 		Util::print_user_message("De novo assembly");
-		Util::process_cmd("$BIN_DIR/Velvet_Optimiser_combined.pl --parameters $TEMP_DIR/optimization.result --file_list $file_list --input_suffix unmapped --file_type fastq --objective_type $objective_type --hash_end 19 --coverage_end 25 --output_suffix assemblied");
+		#Util::process_cmd("$BIN_DIR/Velvet_Optimiser_combined.pl --parameters $TEMP_DIR/optimization.result --file_list $file_list --input_suffix unmapped --file_type fastq --objective_type $objective_type --hash_end 19 --coverage_end 25 --output_suffix assemblied");
+        Velvet_Optimiser_combined("$TEMP_DIR/optimization.result", $file_list, "unmapped", "fastq", $objective_type, 19, 25, "assemblied");
 	}	
 	else
 	{
 		Util::print_user_message("De novo assembly");
-		Util::process_cmd("$BIN_DIR/Velvet_Optimiser_combined.pl --parameters $TEMP_DIR/optimization.result --file_list $file_list --file_type $file_type --objective_type $objective_type --hash_end 19 --coverage_end 25 --output_suffix assemblied");
+		#Util::process_cmd("$BIN_DIR/Velvet_Optimiser_combined.pl --parameters $TEMP_DIR/optimization.result --file_list $file_list --file_type $file_type --objective_type $objective_type --hash_end 19 --coverage_end 25 --output_suffix assemblied");
+        Velvet_Optimiser_combined("$TEMP_DIR/optimization.result", $file_list, "", "fastq", $objective_type, 19, 25, "assemblied");
 	}
     #the script is messing up here in this removeRedundancy line:
     removeRedundancy($file_list, $file_type, "assemblied", "NOVEL", $parameters_remove_redundancy);
