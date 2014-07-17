@@ -220,25 +220,6 @@ sub removeRedundancy{
         # get aligned files size, do not remove redundancy if file size is 0
         my $file_size = -s "$contig_file";
         next if $file_size == 0;
-#        if ($input_suffix =~ "combined") {
-#            my $in  = IO::File->new("$sample.$input_suffix") || die $!;
-#            my $out = IO::File->new(">"."$sample.$input_suffix.fasta") || die $!;
-#            while(<$in>)
-#            {
-#                chomp;
-#                next if $_ =~ m/^@/;
-#                my @a = split(/\t/, $_);
-#                
-#                
-#                if ( scalar(@a > 8) ) {
-#                    print $out ">"."\@$a[0]\n";
-#                    print $out "\@$a[9]\n";
-#                }
-#            }
-#            $in->close;
-#            $out->close;
-#            Util::process_cmd("mv $sample.$input_suffix.fasta $sample.$input_suffix");
-#        }
         # if file has sequence, move it to temp folder to remove redundancy
         # 1. remove simple repeate sequence using mask
         Util::process_cmd("$BIN_DIR/dust $sample.$input_suffix 1> $sample.masked 2> $tf/dust.log");
@@ -513,26 +494,6 @@ sub Velvet_Optimiser_combined {
 	}
 	close(IN);
 }
-#sub runVelvet {
-#    my ($sample1, $hash_length, $cov_cutoff) = @_;
-#	my $outputDir=$sample1."_".$hash_length."_".$cov_cutoff;
-#    
-#	my $file;
-#	if ($input_suffix)	{ $file = "$sample1.$input_suffix"; }
-#	else 			{ $file = $sample1; }
-#    
-#	Util::process_cmd($velvet_dir."/velveth $outputDir $hash_length -$file_type $file >> $tf/velvet.log");
-#	Util::process_cmd($velvet_dir."/velvetg $outputDir -cov_cutoff $cov_cutoff -min_contig_lgth 30 >> $tf/velvet.log");
-#}
-#sub runVelvet1 {
-#    my ($sample, $hash_length, $cov_cutoff) = @_;
-#	my $outputDir = $sample."_".$hash_length."_".$cov_cutoff;
-#	my $file;
-#	if ($input_suffix)	{ $file = "$sample.$input_suffix"; }
-#	else			{ $file = $sample; }
-#	Util::process_cmd($velvet_dir."/velveth $outputDir $hash_length -$file_type $file > $tf/velvet.log");
-#	Util::process_cmd($velvet_dir."/velvetg $outputDir -cov_cutoff $cov_cutoff -min_contig_lgth 30 > $tf/velvet.log");
-#}
 sub contigStats {
 	
 	my $file = shift;
