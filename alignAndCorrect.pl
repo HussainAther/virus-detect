@@ -131,7 +131,7 @@ sub filter_SAM
 	}
     
     $in->close;
-	my $filtered_count = $total_count - $kept_align;
+    $filtered_count = $total_count - $kept_align;
 	#print STDERR "This program filtered $filtered_count out of $total_count reads (" . sprintf("%.2f", $filtered_count / $total_count * 100) . ") as 2ndhits reads, only for BWA\n";
 	$out->close;
 	Util::process_cmd("mv $temp_SAM $input_SAM");

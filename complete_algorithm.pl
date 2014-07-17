@@ -221,7 +221,6 @@ main: {
     my $cmd_align = "$BIN_DIR/alignAndCorrect.pl --file_list $file_list --reference $DATABASE_DIR/$reference --coverage $coverage --output_suffix aligned";
 	#my $cmd_align = "$BIN_DIR/alignAndCorrect.pl --file_list $file_list --reference $ref_list --coverage $coverage --output_suffix aligned";
 	Util::process_cmd($cmd_align);
-    print "YEAAAAA";
     removeRedundancy($file_list, $file_type, "aligned", "KNOWN", $parameters_remove_redundancy);
 	#my $cmd_removeRedundancy = "$BIN_DIR/removeRedundancy_batch.pl --file_list $file_list --file_type $file_type --input_suffix aligned ".
 	#			   "--contig_prefix KNOWN $parameters_remove_redundancy";
@@ -232,8 +231,6 @@ main: {
 	# 1. remove host related reads  
 	# 2. de novo assembly
 	# 3. remove redundancy contigs after assembly
-    print "UNNH!";
-	
 	if( $host_reference ){
 		Util::print_user_message("Align reads to host reference sequences");
 		#Util::process_cmd("$BIN_DIR/bwa_remove.pl --file_list $file_list --reference $DATABASE_DIR/$host_reference $parameters_bwa_align");

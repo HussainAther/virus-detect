@@ -29,6 +29,7 @@ my $reference= "vrl_plant";			# virus sequence
 my $host_reference;       			# host reference
 my $thread_num = 8; 				# thread number
 my $file_list;
+my $kept_align;
 
 # paras for BWA
 my $max_dist = 1;  				# max edit distance
@@ -322,7 +323,7 @@ sub filter_SAM
 {
 	my $input_SAM = shift;
 	my $temp_SAM = $input_SAM.".temp";
-	my ($total_count, $filtered_count) = (0, 0);
+	my ($total_count, $filtered_count, $kept_align) = (0, 0, 0);
     my ($query_col, $opt_col) = (0, 11); 	# query and option column number for sam
 	my $max_distance = 2;			# set $max_distance for all selected hits
 	my $bestEditDist = -1;			# set best edit distance
@@ -341,14 +342,14 @@ sub filter_SAM
 		else {	print $out $_."\n"; }
 		$total_count++;
 	}
-    my ($total_count, $kept_align) = (0,0);
+    
 	$in->close;
 	$out->close;
 	Util::process_cmd("mv $temp_SAM $input_SAM");
 	#print STDERR "This program filtered $filtered_count out of $total_count reads (" . sprintf("%.2f", $filtered_count / $total_count * 100) . ") as unmapped reads, only for BWA\n";
     
-	my $in  = IO::File->new($input_SAM) || die $!;
-	my $out = IO::File->new(">".$temp_SAM) || die $!;
+	$in  = IO::File->new($input_SAM) || die $!;
+	$out = IO::File->new(">".$temp_SAM) || die $!;
 	while(<$in>)
 	{
 		chomp;
@@ -400,7 +401,7 @@ sub filter_SAM
 	}
     
 	$out->close;
-	my $filtered_count = $total_count - $kept_align;
+    $filtered_count = $total_count - $kept_align;
 	#print STDERR "This program filtered $filtered_count out of $total_count reads (" . sprintf("%.2f", $filtered_count / $total_count * 100) . ") as 2ndhits reads, only for BWA\n";
 }
 sub Velvet_Optimiser_combined {
@@ -485,7 +486,7 @@ sub Velvet_Optimiser_combined {
 	close(IN);
 	close(OUT1);
 	close(OUT2);
-    my $i=0;
+    $i=0;
 	my $resultDir;
 	open(IN, "$parameters");
 	while (<IN>) {
