@@ -179,7 +179,7 @@ foreach my $sample (@ARGV)
 	# my $align_parameters = "-n $max_dist -o $max_open -e $max_extension -i 0 -l $len_seed -k $dist_seed -t $thread_num";
 	# my $align_program    = "$BIN_DIR/bwa";
 	my $align_program    = "$BIN_DIR/bowtie2/bowtie2";
-	my $align_parameters = "--end-to-end -D 20 -R 3 -N $max_dist -L 13 -i S,1,0.50 --gbar 1 -p $thread_num -a";
+	my $align_parameters = "--end-to-end -D 20 -R 3 -N 0 -L 13 -i S,1,0.50 --gbar 1 -p $thread_num -a";
 	$align_parameters.=" -f " if $file_type eq 'fasta';
 
 
@@ -195,6 +195,9 @@ foreach my $sample (@ARGV)
 	align::pileup_filter("$sample.pre.pileup", "$seq_info", "$coverage", "$sample.pileup", $debug) unless (-s "$sample.pileup");	# filter pileup file 
 	align::pileup_to_contig("$sample.pileup", "$sample.aligned", 40, 0, 'ALIGNED'); # input, output, min_len, min_depth, prefix
 	align::remove_redundancy("$sample.aligned", $sample, $rr_blast_parameters, $max_end_clip, $min_overlap, 'ALIGNED', $BIN_DIR, $TEMP_DIR, $debug);
+
+	exit;
+
 	
 	# part B: 1. remove host related reads  2. de novo assembly 3. remove redundancy contigs
 	# parameter for velvet: $sample, $output_contig, $kmer_start, $kmer_end, $coverage_start, $coverage_end, $objective_type, $bin_dir, $temp_dir, $debug
