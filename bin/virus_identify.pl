@@ -366,8 +366,9 @@ sub get_contig_mapped_depth
 	my ($contig, $sample, $cpu_num, $file_type) = @_;
 
 	my $format = ''; if( $file_type eq "fasta" ){ $format = "-f" };
-	Util::process_cmd("$BIN_DIR/bowtie-build --quiet $contig $contig", $debug);
-	Util::process_cmd("$BIN_DIR/bowtie --quiet $contig -v 1 -p $cpu_num -a --best --strata $format $sample -S --sam-nohead $sample.sam", $debug);
+	Util::process_cmd("$BIN_DIR/bowtie2/bowtie2-build --quiet $contig $contig", $debug);
+	#Util::process_cmd("$BIN_DIR/bowtie --quiet $contig -v 1 -p $cpu_num -a --best --strata $format $sample -S --sam-nohead $sample.sam", $debug);
+	Util::process_cmd("$bin_dir/bowtie2/bowtie2 --end-to-end -D 20 -R 3 -N 0 -L 13 -i S,1,0.50 --gbar 1 -p $cpu_num $format -a -x $contig -U $sample -S $sample.sam", $debug);
 	Util::process_cmd("$BIN_DIR/samtools faidx $contig");
 	Util::process_cmd("$BIN_DIR/samtools view -bt $contig.fai $sample.sam > $sample.bam");
 	Util::process_cmd("$BIN_DIR/samtools sort $sample.bam $sample.sorted");
