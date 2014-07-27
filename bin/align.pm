@@ -769,7 +769,7 @@ sub base_correction
         system("rm $read_file.sorted.bam");
         system("rm $read_file.pileup"); 	# must delete this file for next cycle remove redundancy
         system("rm $contig_file.fai");
-        system("rm $temp_dir/*.ebwt");
+        system("rm $temp_dir/*.bt2");
 }
 =cut
 
