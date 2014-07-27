@@ -179,9 +179,8 @@ foreach my $sample (@ARGV)
 	# my $align_parameters = "-n $max_dist -o $max_open -e $max_extension -i 0 -l $len_seed -k $dist_seed -t $thread_num";
 	# my $align_program    = "$BIN_DIR/bwa";
 	my $align_program    = "$BIN_DIR/bowtie2/bowtie2";
-	my $align_parameters = "--end-to-end -D 20 -R 3 -N 0 -L 13 -i S,1,0.50 --gbar 1 -p $thread_num -a";
+	my $align_parameters = "--quiet --end-to-end -D 20 -R 3 -N 0 -L 13 -i S,1,0.50 --gbar 1 -p $thread_num -a";
 	$align_parameters.=" -f " if $file_type eq 'fasta';
-
 
 	print "Align Program: $align_program\nAlign Parameters: $align_parameters\nAlign Input File: $sample\nAlign Output File: $sample.sam\n" if $debug;
 

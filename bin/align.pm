@@ -9,7 +9,6 @@ use FindBin;
 use lib "$FindBin::RealBin";
 use Util;
 
-
 # our @ISA = qw( Exporter );
 
 # our @EXPORT_OK = qw( renameFasta bwa_remove removeRedundancy filter_SAM files_combine2 );
@@ -748,7 +747,7 @@ sub base_correction
 	# chagne to bowtie2
 	Util::process_cmd("$bin_dir/bowtie2/bowtie2-build --quiet -f $contig_file $contig_file", $debug);
 	Util::process_cmd("$bin_dir/samtools faidx $contig_file 2> $temp_dir/samtools.log", $debug);
-	Util::process_cmd("$bin_dir/bowtie2/bowtie2 --end-to-end -D 20 -R 3 -N 0 -L 13 -i S,1,0.50 --gbar 1 -p $cpu_num $format -a -x $contig_file -U $read_file -S $read_file.sam", $debug);
+	Util::process_cmd("$bin_dir/bowtie2/bowtie2 --quite --end-to-end -D 20 -R 3 -N 0 -L 13 -i S,1,0.50 --gbar 1 -p $cpu_num $format -a -x $contig_file -U $read_file -S $read_file.sam", $debug);
 
         Util::process_cmd("$bin_dir/samtools view -bS $read_file.sam > $read_file.bam 2> $temp_dir/samtools.log");
         Util::process_cmd("$bin_dir/samtools sort $read_file.bam $read_file.sorted 2> $temp_dir/samtools.log");
