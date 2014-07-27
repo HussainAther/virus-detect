@@ -104,12 +104,14 @@ my $objective_type='maxLen';			# objective type for Velvet assembler: n50°¢max
 my $diff_ratio= 0.25;
 my $diff_contig_cover = 0.5;
 my $diff_contig_length= 100; 
+my $debug;
 
 # get input paras #
 GetOptions(
-	'r|reference=s'	=> 		\$reference,
-	'h|host_reference=s' => 	\$host_reference,
-	't|thread_num=i' => 		\$thread_num,
+	'r|reference=s'	=> 	\$reference,
+	'h|host_reference=s' => \$host_reference,
+	't|thread_num=i' => 	\$thread_num,
+	'd|debug' =>		\$debug,
 
 	'max_dist=i' => 	\$max_dist,
 	'max_open=i' => 	\$max_open,
@@ -141,8 +143,6 @@ GetOptions(
 	'coverage_cutoff=f' =>	\$coverage_cutoff,
 	'depth_cutoff=f' =>	\$depth_cutoff
 );
-
-my $debug = 1;
 
 # check input file
 die "Please input one file:\n\n$usage\n" unless scalar(@ARGV) == 1;
