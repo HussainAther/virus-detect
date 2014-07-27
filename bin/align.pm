@@ -741,9 +741,15 @@ sub base_correction
 	$format = '-f' if $file_type eq 'fasta';
 	die "[ERR]Undef file type for $read_file\n" if ($file_type ne "fasta" && $file_type ne "fastq");
 	#aligment -> sam -> bam -> sorted bam -> pileup
-        Util::process_cmd("$bin_dir/bowtie-build --quiet -f $contig_file $contig_file", $debug);
-        Util::process_cmd("$bin_dir/samtools faidx $contig_file 2> $temp_dir/samtools.log", $debug);
-        Util::process_cmd("$bin_dir/bowtie --quiet -v 1 -p $cpu_num $format -S -a --best $contig_file $read_file $read_file.sam", $debug);
+	#Util::process_cmd("$bin_dir/bowtie-build --quiet -f $contig_file $contig_file", $debug);
+        #Util::process_cmd("$bin_dir/samtools faidx $contig_file 2> $temp_dir/samtools.log", $debug);
+        #Util::process_cmd("$bin_dir/bowtie --quiet -v 1 -p $cpu_num $format -S -a --best $contig_file $read_file $read_file.sam", $debug);
+
+	# chagne to bowtie2
+	Util::process_cmd("$bin_dir/bowtie2/bowtie2-build --quiet -f $contig_file $contig_file", $debug);
+	Util::process_cmd("$bin_dir/samtools faidx $contig_file 2> $temp_dir/samtools.log", $debug);
+	Util::process_cmd("$bin_dir/bowtie2/bowtie2 --end-to-end -D 20 -R 3 -N 0 -L 13 -i S,1,0.50 --gbar 1 -p $cpu_num $format -a -x $contig_file -U $read_file -S $read_file.sam", $debug);
+
         Util::process_cmd("$bin_dir/samtools view -bS $read_file.sam > $read_file.bam 2> $temp_dir/samtools.log");
         Util::process_cmd("$bin_dir/samtools sort $read_file.bam $read_file.sorted 2> $temp_dir/samtools.log");
         Util::process_cmd("$bin_dir/samtools mpileup -f $contig_file $read_file.sorted.bam > $read_file.pileup 2> $temp_dir/samtools.log");
